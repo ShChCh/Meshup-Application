@@ -1,25 +1,16 @@
-# Mushup Application
+# docker-nginx-mysql-flask
+Skeleton for docker-compose nginx/flask-mysql containers.
 
-This repository is used for dev a mashup application with RESTFUL coding format.
+This is a skeleton that shows how to use Nginx with a flask application and a mysql data container.  It uses docker-compose to instantiate everything.
 
-# AWS
-using cmd:
-```ssh ubuntu@ec2-13-210-246-130.ap-southeast-2.compute.amazonaws.com```
-
-key file should be: ```laddoc.pem```   email laddoc@outlook.com if you lose this pem file
-
-# Start:
-To start and deploy, use command:
+Simple use
 
 ```docker-compose up```
 
-# To start
-when you modify code in \nginx-flask\webapp or other conf files using
+To start the process.
+
+A data directory for mysql is created so that the data is persistent if you remove the container.  The flask application is mounted into the container as to make it easier to incorporate changes.
+
+If you change something in the application and wish to bring them into effect, just use:
 
 ```docker-compose restart```
-
-# Imigration Time
-21:00 - 22:00 every two days
-
-# port exposed:
-22 80 3306 2223 5000
