@@ -3,10 +3,10 @@ from flask import Blueprint
 
 adaptors = Blueprint('adaptors', __name__)
 
-@adaptors.route('/adaptor')
+@adaptors.route('/')
 def testRoute():
     return 'testing adaptor succ!'
 
-@adaptors.route('/adaptors/<op>')
+@adaptors.route('/ops/<op>')
 def adaptorTest():
     return True

@@ -3,10 +3,10 @@ from flask import Blueprint
 
 sessions = Blueprint('sessions', __name__)
 
-@sessions.route('/sessions')
+@sessions.route('/')
 def test():
     return 'testing sessions succ!'
 
-@sessions.route('/sessions/<op>')
+@sessions.route('/ops/<op>')
 def sessiontest():
     return True
