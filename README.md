@@ -1,16 +1,32 @@
-# docker-nginx-mysql-flask
-Skeleton for docker-compose nginx/flask-mysql containers.
+# For use
 
-This is a skeleton that shows how to use Nginx with a flask application and a mysql data container.  It uses docker-compose to instantiate everything.
+Skeleton for nginx-uwsgi-flask-mysql
 
-Simple use
+# Command line for starting
 
 ```docker-compose up```
 
 To start the process.
 
-A data directory for mysql is created so that the data is persistent if you remove the container.  The flask application is mounted into the container as to make it easier to incorporate changes.
-
-If you change something in the application and wish to bring them into effect, just use:
+# Command line for restarting
 
 ```docker-compose restart```
+
+```docker-compose up```
+
+# Layers:
+
+APP: front-end showing controller
+
+Session: Organize data (ATOM , etc.)
+
+Adaptor: Fetch Data from other publications
+
+# Testing:
+
+SSH to AWS:
+
+```ssh ubuntu@ec2-13-210-246-130.ap-southeast-2.compute.amazonaws.com```
+
+key file :   ```laddoc.pem```
+email:   email <laddoc@outlook.com> when you lose this file
