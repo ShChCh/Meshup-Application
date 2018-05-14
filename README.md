@@ -14,7 +14,8 @@ To start and deploy, use command:
 ```docker-compose up```
 
 # To start
-when you modify code in \nginx-flask\webapp or other conf files
+when you modify code in \nginx-flask\webapp or other conf files using
+
 ```docker-compose restart```
 
 # Imigration Time
