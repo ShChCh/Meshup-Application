@@ -3,7 +3,7 @@
 Skeleton for nginx-uwsgi-flask-mysql
 
 # Command line for starting
-
+a
 ```docker-compose up```
 
 To start the process.
