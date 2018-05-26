@@ -121,19 +121,39 @@ def get_sales_collections():
 @app.route("/nsw_rent_data/<lga_name>", methods=["GET"])
 # @login_required
 def get_rent_by_lga(lga_name):
-    lga_qs = Rent.objects(file_name=lga_name)
-    if lga_qs is not []:
-        lga = lga_qs[0]
-        xml_dict = {
-            'id': request.base_url,
-            'updated': lga.last_modified,
-            'lga_name': lga.file_name[:-8],
-            'year_data': lga.year_data,
-            'average': lga.average
-        }
+    qs = Rent.objects(lga_name=lga_name)
+    if qs is not []:
+        rent = qs[0]
+        xml_dict = {'id': '{}/{}'.format(request.base_url, rent.lga_name),
+                    'lga_name': rent.lga_name,
+                    'one_bed': rent.one_bed,
+                    'annual_rate_one_bed': rent.annual_rate_one_bed,
+                    'two_bed': rent.two_bed,
+                    'annual_rate_two_bed': rent.annual_rate_two_bed,
+                    'three_bed': rent.three_bed,
+                    'annual_rate_three_bed': rent.annual_rate_three_bed,
+                    'four_bed': rent.four_bed,
+                    'annual_rate_four_bed': rent.annual_rate_four_bed
+                    }
         return jsonify(xml_dict), 200
     else:
-        return "Id not found.", 404
+        return "LGA name not found.", 404
+
+
+@app.route("/nsw_sales_data/<lga_name>", methods=["GET"])
+# @login_required
+def get_sales_by_lga(lga_name):
+    qs = Rent.objects(lga_name=lga_name)
+    if qs is not []:
+        sale = qs[0]
+        xml_dict = {'id': '{}/{}'.format(request.base_url, sale.lga_name),
+                    'lga_name': sale.lga_name,
+                    'median': sale.median,
+                    'annual_rate_median': sale.annual_rate_median
+                    }
+        return jsonify(xml_dict), 200
+    else:
+        return "LGA name not found.", 404
 
 
 def update_db():
@@ -155,5 +175,5 @@ if __name__ == "__main__":
     #     replace_existing=True)
     # # Shut down the scheduler when exiting the app
     # atexit.register(lambda: scheduler.shutdown())
-#
+    #
     app.run()
