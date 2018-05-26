@@ -137,7 +137,7 @@ def get_collections():
 # @admin_required
 def delete_by_id(rid):
     lga_qs = LGA.objects(file_name=rid + 'lga.xlsx')
-    if lga_qs is not []:
+    if lga_qs.count() != 0:
         lga = lga_qs[0]
         lga.delete()
         return 'Delete Success.', 200
@@ -149,7 +149,7 @@ def delete_by_id(rid):
 # @login_required
 def get_by_id(rid):
     lga_qs = LGA.objects(file_name=rid + 'lga.xlsx')
-    if lga_qs is not []:
+    if lga_qs.count() != 0:
         lga = lga_qs[0]
         year_data=dict()
         for dt in lga.year_data:

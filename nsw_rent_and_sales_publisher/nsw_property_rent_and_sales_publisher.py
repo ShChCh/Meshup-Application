@@ -110,7 +110,7 @@ def get_sales_collections():
 # # @admin_required
 # def delete_by_id(rid):
 #     lga_qs = LGA.objects(file_name=rid + 'lga.xlsx')
-#     if lga_qs is not []:
+#     if lga_qs.count()!=0:
 #         lga = lga_qs[0]
 #         lga.delete()
 #         return 'Delete Success.', 200
@@ -122,7 +122,7 @@ def get_sales_collections():
 # @login_required
 def get_rent_by_lga(lga_name):
     qs = Rent.objects(lga_name=lga_name)
-    if qs is not []:
+    if qs.count() != 0:
         rent = qs[0]
         xml_dict = {'id': '{}/{}'.format(request.base_url, rent.lga_name),
                     'lga_name': rent.lga_name,
@@ -144,7 +144,7 @@ def get_rent_by_lga(lga_name):
 # @login_required
 def get_sales_by_lga(lga_name):
     qs = Rent.objects(lga_name=lga_name)
-    if qs is not []:
+    if qs.count()!=0:
         sale = qs[0]
         xml_dict = {'id': '{}/{}'.format(request.base_url, sale.lga_name),
                     'lga_name': sale.lga_name,
