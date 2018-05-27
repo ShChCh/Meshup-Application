@@ -4,7 +4,7 @@ from urllib.request import urlopen
 from flask import Flask, jsonify, request
 from io import StringIO
 from models import School
-import flask_cors
+from flask_cors import *
 from mongoengine import connect
 
 data_url = 'https://data.cese.nsw.gov.au/data/dataset/027493b2-33ad-3f5b-8ed9-37cdca2b8650/resource/2ac19870-44f6' \
