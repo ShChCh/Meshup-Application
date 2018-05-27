@@ -19,7 +19,7 @@ rent_url = 'https://data.nsw.gov.au/data/dataset/05aaef34-d175-4e0d-9cc1-a705344
 sales_url = 'https://data.nsw.gov.au/data/dataset/05aaef34-d175-4e0d-9cc1-a70534447495/resource/2537fdfa-e256-483a-8de5-a98148bcd306/download/GStrategic-PolicyInformationData-NSW2016-Dataset-uploadsFACSSales-tables-December-qtr.xls'
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, supports_credentials=True)
 connect(
     host='mongodb://user:user@ds133360.mlab.com:33360/nsw_rent_and_sales'
 )
@@ -176,4 +176,4 @@ if __name__ == "__main__":
     # # Shut down the scheduler when exiting the app
     # atexit.register(lambda: scheduler.shutdown())
     #
-    app.run()
+    app.run(port=50101)

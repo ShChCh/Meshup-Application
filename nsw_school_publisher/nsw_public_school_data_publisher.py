@@ -11,7 +11,7 @@ data_url = 'https://data.cese.nsw.gov.au/data/dataset/027493b2-33ad-3f5b-8ed9-37
            '-443d-a0c3-4c867f04c305/download/masterdatasetnightlybatchcollections.csv '
 
 app = Flask(__name__)
-flask_cors.CORS(app)
+CORS(app, supports_credentials=True)
 connect(
     host='mongodb://user:user@ds135760.mlab.com:35760/nsw_school_data'
 )
@@ -76,4 +76,4 @@ def get_all_school_data():
 
 if __name__ == "__main__":
     update_db()
-    app.run()
+    app.run(port=50103)

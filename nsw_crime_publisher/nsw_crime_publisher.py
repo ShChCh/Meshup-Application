@@ -17,7 +17,7 @@ from openpyxl import load_workbook
 from models import LGA, Year
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, supports_credentials=True)
 connect(
     host='mongodb://user:user@ds231360.mlab.com:31360/nsw_crime_data'
 )
@@ -200,4 +200,4 @@ if __name__ == "__main__":
     # Shut down the scheduler when exiting the app
     atexit.register(lambda: scheduler.shutdown())
 
-    app.run()
+    app.run(port=50102)
