@@ -1,13 +1,16 @@
-from flask import Flask, jsonify,request
-import math
+from flask import Flask, jsonify,request, send_file
+# import math
 import os
 import numpy as np
 import json
 import requests
-import argparse
-import operator
-from openpyxl import load_workbook
+# import argparse
+# import operator
+# from openpyxl import load_workbook
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+
 from scipy.interpolate import spline
 from flask_cors import *
 
@@ -93,7 +96,7 @@ from flask_cors import *
 # with open("/Users/wyj/Desktop/lgalist5.json","w") as f:
 #
 #     json.dump(lga_list, f)
-x = open('/Users/wyj/Desktop/final_lga.json','r')
+x = open('./final_lga.json','r')
 lga_dic = json.load(x)
 lga_set = set()
 for key in lga_dic:
@@ -105,12 +108,14 @@ CORS(app, supports_credentials=True)
 
 @app.route('/get_all_crimedata', methods=['GET'])
 def get_all_crimedata():
-    response = requests.get("http://localhost:50102/nsw_crime_data", params=None)
+
+    # response = requests.get("http://localhost:50102/nsw_crime_data", params=None)
+    response = requests.get("http://54.252.243.63:50102/nsw_crime_data", params=None)
     # print("statistics:", response.json())
     load_dict = response.json()
     json = {}
     sorted_x = sorted(load_dict['entry'], key=lambda k: k['average'])
-    # print(sorted_x)
+    print(len(sorted_x))
     for i in range(len(sorted_x)):
         if sorted_x[i]['lga_name'] in lga_dic:
 
@@ -129,7 +134,10 @@ def get_one_crimedata(lga_id):
     lga_name = lga_id
     lga_name = ''.join([x for x in lga_name.lower() if x.isalpha()])
     print(lga_name)
-    response = requests.get("http://localhost:50102/nsw_crime_data/"+ lga_name, params=None)
+    # response = requests.get("http://localhost:50102/nsw_crime_data/"+ lga_name, params=None)
+    response = requests.get("http://54.252.243.63:50102/nsw_crime_data/" + lga_name, params=None)
+    if response.status_code == 404:
+        return jsonify('wrong lganame'), 404
     print("statistics:", response.json())
     load_dict = response.json()
     json = {}
@@ -150,7 +158,7 @@ def get_one_crimedata(lga_id):
     plt.ylabel("Crimes")
     plt.title(lga_name+" Recorded Crime Statistics")
     plt.savefig("crimes.png")
-    path  = os.getcwd()+"/crimes.png"
+    path  = "/img/crimes"
     print(path)
     data = {'year_data': load_dict['year_data'],
             'average': load_dict['average'],
@@ -162,7 +170,9 @@ def get_one_crimedata(lga_id):
 
 @app.route('/get_all_rent', methods=['GET'])
 def get_all_rent():
-    response = requests.get("http://localhost:50101/nsw_rent_data", params=None)
+    # response = requests.get("http://localhost:50101/nsw_rent_data", params=None)
+    response = requests.get("http://54.252.243.63:50101/nsw_rent_data", params=None)
+
     print("statistics:", response.json())
     load_dict = response.json()
     json = {}
@@ -211,7 +221,10 @@ def get_one_rent(lga_id):
     lga_name = lga_id
 
     lga_name = ''.join([x for x in lga_name.lower() if x.isalpha()])
-    response = requests.get("http://localhost:50101/nsw_rent_data/" + lga_name, params=None)
+    # response = requests.get("http://localhost:50101/nsw_rent_data/" + lga_name, params=None)
+    response = requests.get("http://54.252.243.63:50101/nsw_rent_data/" + lga_name, params=None)
+    if response.status_code == 404:
+        return jsonify('wrong lganame'), 404
     print("statistics:", response.json())
     load_dict = response.json()
     json = {}
@@ -232,7 +245,7 @@ def get_one_rent(lga_id):
     plt.ylabel("Price")
     plt.title(lga_name+" Recorded RENT Statistics")
     plt.savefig("rents.png")
-    path = os.getcwd()+"/rents.png"
+    path = "/img/rents"
     print(path)
     data = {
             'path': path}
@@ -242,7 +255,8 @@ def get_one_rent(lga_id):
 
 @app.route('/get_all_sales', methods=['GET'])
 def get_all_sales():
-    response = requests.get("http://localhost:50101/nsw_sales_data", params=None)
+    # response = requests.get("http://localhost:50101/nsw_sales_data", params=None)
+    response = requests.get("http://54.252.243.63:50101/nsw_sales_data", params=None)
     # print("statistics:", response.json())
     load_dict = response.json()
     print(type(response))
@@ -265,7 +279,10 @@ def get_one_sale(lga_id):
     lga_name = lga_id
     lga_name = ''.join([x for x in lga_name.lower() if x.isalpha()])
     print(lga_name)
-    response = requests.get("http://localhost:50101/nsw_sales_data/" + lga_name, params=None)
+    # response = requests.get("http://localhost:50101/nsw_sales_data/" + lga_name, params=None)
+    response = requests.get("http://54.252.243.63:50101/nsw_sales_data/" + lga_name, params=None)
+    if response.status_code == 404:
+        return jsonify('wrong lganame'), 404
     print("statistics:", response.json())
     load_dict = response.json()
     json = {}
@@ -292,14 +309,17 @@ def get_all_coordinates():
 def get_all_set():
     total_rank = {}
     # sale_rank = get_all_sales()
-    response = requests.get("http://localhost:50100/get_all_sales", params=None)
+    # response = requests.get("http://localhost:50100/get_all_sales", params=None)
+    response = requests.get("http://54.252.243.63:50100/get_all_sales", params=None)
     # print("type",type(sale_rank))
     sale_dic = response.json()
     # print('kkkkkk', sale_dic)
-    response = requests.get("http://localhost:50100/get_all_rent", params=None)
+    # response = requests.get("http://localhost:50100/get_all_rent", params=None)
+    response = requests.get("http://54.252.243.63:50100/get_all_rent", params=None)
     # rent_rank = get_all_rent()
     rent_dic = response.json()
-    response = requests.get("http://localhost:50100/get_all_crimedata", params=None)
+    response = requests.get("http://54.252.243.63:50100/get_all_crimedata", params=None)
+    # response = requests.get("http://localhost:50100/get_all_crimedata", params=None)
     # crime_rank = get_all_crimedata()
     crime_dic = response.json()
     print(sale_dic)
@@ -322,8 +342,36 @@ def get_all_set():
     for ii in range(len(sort_x)):
         rank_list[sort_x[ii][0]] = ii
     return jsonify(rank_list)
+@app.route('/get_one_school/<string:lga_id>', methods=['GET'])
+def get_one_school(lga_id):
+    # response = requests.get("http://localhost:50103/nsw_school_data/" + lga_id, params=None)
+    response = requests.get("http://54.252.243.63:50103/nsw_school_data/" + lga_id, params=None)
+    if response.status_code == 404:
+        return jsonify('wrong lganame'), 404
+    print("statistics:", response.json())
+    load_dict = response.json()
+    json = {}
+
+    for x in range(len(load_dict['entry'])):
+        data ={'postcode': load_dict['entry'][x]['post_code'],
+               'latitude' :load_dict['entry'][x]['latitude'],
+               'longitude':load_dict['entry'][x]['longitude'],
+               'school_type':load_dict['entry'][x]['school_type']
+               }
+        json[load_dict['entry'][x]['school_name']] = data
+    json['total_number'] =len(load_dict['entry'])
+    return jsonify(json)
+
+@app.route('/img/<file_name>')
+def get_img(file_name):
+    # with open("/Users/wyj/Desktop/{}.png".format(file_name), 'rb') as f:
+    #     print(f.read()
+    return send_file("{}.png".format(file_name),mimetype="image/png")
+
+
 
 if __name__ == '__main__':
+    # app.run(host='0.0.0.0', port=80)
 
     app.run(port=50100)
 
