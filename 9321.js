@@ -9,8 +9,11 @@ var neighborhoods = [
 var markers = [];
 var marker;
 var myCenter = {lat: -33.91665490690587, lng: 151.2312249841309};
+var lastPolyonIdx = -1;
 
-function MapMenu(controlDiv, map, txt) {
+var polygonArr = [];
+var colors = ['#ff2b00', '#0000ff', '#ffff00', '#ff9900', '#eed898'];
+function MapMenu(controlDiv, map, txt, type) {
 
         // tab controllers
                 
@@ -37,30 +40,20 @@ function MapMenu(controlDiv, map, txt) {
 
         // Setup the click event listeners: simply set the map to Chicago.
         controlUI.addEventListener('click', function() {
-          //drop();
+            if(type==1)
+                setCriHM();
+            if(type==2)
+                setRentingHM();
+            if(type==3)
+                setSalesHM();
+            if(type==4)
+                setAllHM();
+            if(type==5)
+                setSingle();
         });
 
       }
 
-function drop() {
-  clearMarkers();
-  for (var i = 0; i < neighborhoods.length; i++) {
-    addMarkerWithTimeout(neighborhoods[i], i * 200);
-  }
-}
-
-function addMarkerWithTimeout(position, timeout) {
-      window.setTimeout(function() {
-        var m = new google.maps.Marker({
-            position: position,
-            map: map,
-            draggable:true,
-            animation: google.maps.Animation.DROP
-        });
-        m.addListener('click',toggleBounce);
-        markers.push(m);
-  }, timeout);
-}
 
 function clearMarkers() {
   for (var i = 0; i < markers.length; i++) {
@@ -140,7 +133,9 @@ function toggleBounce() {
 function initMap() {
     
   
-  // load cowra map
+  // load cowra map 
+  // 边界构成的多边形存在polygonArr中
+  // 此处为init接口，调用接口等待边界数据，最后保存在下方语句中
   var cowraTest = JSON.parse(data);
   map = new google.maps.Map(document.getElementById('map'), {
     center: myCenter,
@@ -150,10 +145,8 @@ function initMap() {
     scaleControl: true
   });
   // set cowra test
-  var colors = ['#FF0230', '#EEAE00', '#BB0328', '#8E2110', '#440000'];
   var count = 0;
   for(var j in cowraTest){
-      count = count+1;
       var cowradata = cowraTest[j];
       var cowraPosition = [];
           for(var i=0; i<cowradata.length; i++){
@@ -162,21 +155,20 @@ function initMap() {
               currPos['lng'] = cowradata[i][0];
               cowraPosition.push(currPos);
           }
-      //console.log(cowraPosition);
-      var flightPath = new google.maps.Polygon({
+      polygonArr[count] = new google.maps.Polygon({
         path: cowraPosition,
         geodesic: true,
-        strokeColor: '#FF0000',
-        fillColor: colors[count%5],
+        name: j,
+        strokeColor: '#000000',
+        fillColor: '#00FA9A',
         strokeOpacity: 1.0,
-        strokeWeight: 2
-      });
-
-      google.maps.event.addListener(flightPath, "click", function(event) {  
+        strokeWeight: 3
+      })
+      ;
+      google.maps.event.addListener(polygonArr[count], "click", function(event) {  
         var lat = event.latLng.lat();  
         var lng = event.latLng.lng();  
         // 经纬度  
-        //alert("Lat=" + lat + "; Lng=" + lng);  
         marker.setMap(null);
         marker = new google.maps.Marker({
             position: {lat:lat, lng:lng},
@@ -186,11 +178,17 @@ function initMap() {
             animation: google.maps.Animation.DROP
         });
         marker.addListener('click', toggleBounce);
+        // for(var k=0; k<polygonArr.length; k++){
+            // if(polygonArr[k].containsLocation(event.latLng))
+                // console.log('polygon id is :'+polygonArr[k].name);
+        // }
+        console.log('polygon id is :'+this.name);
       });  
-      flightPath.setMap(map);
+      //polygonArr[count].setMap(map);
+      
+      count = count+1;
   }
   
-  //
   marker = new google.maps.Marker({
     position: myCenter,
     map: map,
@@ -201,37 +199,134 @@ function initMap() {
   marker.addListener('click', toggleBounce);
   
   var btnDiv = document.createElement('div');
-  var btn = new MapMenu(btnDiv, map, 'Free Press');
+  var btn = new MapMenu(btnDiv, map, 'Rating Heatmap', 4);
   btnDiv.index = 1;
   map.controls[google.maps.ControlPosition.TOP_CENTER].push(btnDiv);
   
   
   var btnDiv1 = document.createElement('div');
-  var btn1 = new MapMenu(btnDiv1, map, 'Ranking');
+  var btn1 = new MapMenu(btnDiv1, map, 'Sales Heatmap', 3);
   btnDiv1.index = 2;
   map.controls[google.maps.ControlPosition.TOP_CENTER].push(btnDiv1);
   
   
   var btnDiv2 = document.createElement('div');
-  var btn2 = new MapMenu(btnDiv2, map, 'Criminal');
+  var btn2 = new MapMenu(btnDiv2, map, 'Criminal Heatmap', 1);
   btnDiv2.index = 3;
   map.controls[google.maps.ControlPosition.TOP_CENTER].push(btnDiv2);
   
   
   var btnDiv3 = document.createElement('div');
-  var btn3 = new MapMenu(btnDiv3, map, 'Renting');
+  var btn3 = new MapMenu(btnDiv3, map, 'Renting Heatmap', 2);
   btnDiv3.index = 4;
   map.controls[google.maps.ControlPosition.TOP_CENTER].push(btnDiv3);
   
   
   
-  // 左键点击获取经纬度
-  // google.maps.event.addListener(map, "click", function(event) {  
-    // var lat = event.latLng.lat();  
-    // var lng = event.latLng.lng();  
-    // // 经纬度  
-    // //alert("Lat=" + lat + "; Lng=" + lng);  
-    // addMarkerWithTimeout({lat: lat, lng: lng}, 200);
-  // });  
+  var btnDiv4 = document.createElement('div');
+  var btn4 = new MapMenu(btnDiv3, map, 'Free Press', 5);
+  btnDiv4.index = 5;
+  map.controls[google.maps.ControlPosition.TOP_CENTER].push(btnDiv4);
   
+  
+  // 当前地点点击，画边界，然后放信息
+  
+    google.maps.event.addListener(map, "click", function(event) {  
+      var lat = event.latLng.lat();  
+      var lng = event.latLng.lng();  
+      // 经纬度  
+      marker.setMap(null);
+      marker = new google.maps.Marker({
+        position: {lat:lat, lng:lng},
+        map: map,
+        title: 'check info or move by click',
+        draggable: true,
+        animation: google.maps.Animation.DROP
+      });
+      marker.addListener('click', toggleBounce);
+      // for(var k=0; k<polygonArr.length; k++){
+        // if(polygonArr[k].containsLocation(event.latLng))
+            // console.log('polygon id is :'+polygonArr[k].name);
+      // }
+      for(var k=0; k<polygonArr.length; k++){
+          if(google.maps.geometry.poly.containsLocation(event.latLng, polygonArr[k])){
+              if(lastPolyonIdx!=-1)
+                  polygonArr[lastPolyonIdx].setMap(null);
+              lastPolyonIdx = k;
+              polygonArr[k].setOptions({fillColor: '#00FA9A'});
+              polygonArr[k].setMap(map);
+              break;
+          }
+      }
+    });  
+    
+}
+
+// 所有的热度图，根据输入的rank不一样来做重新color
+function setHeatMap(d){
+    // cdata两个属性,rank和name
+    // 得到对应的ranking
+    var threshhold = Object.keys(d).length/5;
+    var cthresh = [];
+    cthresh.push(0);
+    cthresh.push(threshhold);
+    cthresh.push(threshhold*2);
+    cthresh.push(threshhold*3);
+    cthresh.push(threshhold*4);
+    cthresh.push(Object.keys(d).length);
+    //console.log(cthresh);
+    for(var i in d)
+        for(var j=0; j<polygonArr.length; j++){
+            if(polygonArr[j].name === i){
+                //console.log("ff__"+i+"__"+polygonArr[j].name+"__found__"+d[i]['rank']+"__");
+                for(var k=0; k<5; k++){
+                    if(d[i]['rank'] < cthresh[k+1] && d[i]['rank'] >= cthresh[k]){
+                        //console.log("__"+polygonArr[j].name+"__"+colors[k]);
+                        polygonArr[j].setOptions({fillColor: colors[k]});
+                        break;
+                    }
+                }
+            }
+            polygonArr[j].setMap(map);
+        }
+}
+
+// 各个hm按钮的单独接口
+function setCriHM(){
+    // 得到criminal data的ranking
+    console.log("criminal");
+    chmd = JSON.parse(cdata);
+    setHeatMap(chmd);
+}
+
+// 各个hm按钮的单独接口
+function setRentingHM(){
+    // 得到criminal data的ranking
+    console.log("renting");
+    rhmd = JSON.parse(rdata);
+    setHeatMap(rhmd);
+}
+
+// 各个hm按钮的单独接口
+function setSalesHM(){
+    // 得到criminal data的ranking
+    console.log("sales");
+    shmd = JSON.parse(sdata);
+    setHeatMap(shmd);
+}
+
+// 各个hm按钮的单独接口
+function setAllHM(){
+    // 得到criminal data的ranking
+    console.log("All");
+    ahmd = JSON.parse(adata);
+    setHeatMap(ahmd);
+}
+
+//  单个区域
+function setSingle(){
+    // 得到criminal data的ranking
+    console.log("Single");
+    for(var j=0; j<polygonArr.length; j++)
+        polygonArr[j].setMap(null);
 }
