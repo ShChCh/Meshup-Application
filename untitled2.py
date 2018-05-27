@@ -10,6 +10,7 @@ import operator
 from openpyxl import load_workbook
 import matplotlib.pyplot as plt
 from scipy.interpolate import spline
+
 from selenium import webdriver
 import urllib
 
@@ -36,17 +37,18 @@ import urllib
 # d = abs((y2 - y1) * x0 +(x1 - x2) * y0 + ((x2 * y1) -(x1 * y2)))/(math.sqrt(pow(y2 - y1, 2) + pow(x1 - x2, 2)))
 # print(d)
 
-
-url1 = "https://docs.google.com/spreadsheets/d/1tHCxouhyM4edDvF60VG7nzs5QxID3ADwr3DGJh71qFg/export?format=xlsx&id=1tHCxouhyM4edDvF60VG7nzs5QxID3ADwr3DGJh71qFg"
-r = requests.get(url1)
-
-lga_mapping = {}
-with open("temp_postcode.xlsx", "wb") as code:
-    code.write(r.content)
-wb = load_workbook(filename=r'temp_postcode.xlsx')
-sheet = wb.get_sheet_by_name('lga_postcode_mappings')
-for i in range(2,1783):
-    lga_mapping[int(sheet.cell(row=i, column=3).value)] = sheet.cell(row=i, column=2).value
+#
+# url1 = "https://docs.google.com/spreadsheets/d/1tHCxouhyM4edDvF60VG7nzs5QxID3ADwr3DGJh71qFg/export?format=xlsx&id=1tHCxouhyM4edDvF60VG7nzs5QxID3ADwr3DGJh71qFg"
+# r = requests.get(url1)
+# lga_set = set()
+# # lga_mapping = {}
+# with open("temp_postcode.xlsx", "wb") as code:
+#     code.write(r.content)
+# wb = load_workbook(filename=r'temp_postcode.xlsx')
+# sheet = wb.get_sheet_by_name('lga_postcode_mappings')
+# for i in range(2,1783):
+#     lga_set.add(sheet.cell(row=i, column=2).value)
+    # lga_mapping[int(sheet.cell(row=i, column=3).value)] = sheet.cell(row=i, column=2).value
 
 
 # lga_list = {}
@@ -93,14 +95,18 @@ for i in range(2,1783):
 # with open("/Users/wyj/Desktop/lgalist5.json","w") as f:
 #
 #     json.dump(lga_list, f)
-x = open('/Users/wyj/Desktop/lgalist4.json','r')
+x = open('/Users/wyj/Desktop/final_lga.json','r')
 lga_dic = json.load(x)
+lga_set = set()
+for key in lga_dic:
+    lga_set.add(key)
+print(lga_set)
 app = Flask(__name__)
 
 
 @app.route('/get_all_crimedata', methods=['GET'])
 def get_all_crimedata():
-    response = requests.get("http://localhost:5001/nsw_crime_data", params=None)
+    response = requests.get("http://localhost:5002/nsw_crime_data", params=None)
     # print("statistics:", response.json())
     load_dict = response.json()
     json = {}
@@ -109,27 +115,27 @@ def get_all_crimedata():
     for i in range(len(sorted_x)):
         if sorted_x[i]['lga_name'] in lga_dic:
 
-            coordinate = lga_dic[sorted_x[i]['lga_name']]
+            # coordinate = lga_dic[sorted_x[i]['lga_name']]
             data = {
                     'average':  sorted_x[i]['average'],
                     'rank': i}
-            json[sorted_x[i]['lga_name']] = {'coordinate':coordinate ,'data':data}
+            json[sorted_x[i]['lga_name']] = data
         else:
             print(sorted_x[i]['lga_name'])
 
     return jsonify(json)
 
-@app.route('/get_one_crimedata/<int:lga_id>', methods=['GET'])
+@app.route('/get_one_crimedata/<string:lga_id>', methods=['GET'])
 def get_one_crimedata(lga_id):
-    lga_name = lga_mapping[lga_id]
+    lga_name = lga_id
     lga_name = ''.join([x for x in lga_name.lower() if x.isalpha()])
     print(lga_name)
-    response = requests.get("http://localhost:5001/nsw_crime_data/"+ lga_name, params=None)
+    response = requests.get("http://localhost:5002/nsw_crime_data/"+ lga_name, params=None)
     print("statistics:", response.json())
     load_dict = response.json()
     json = {}
 
-    coordinate = lga_dic[lga_name]
+    # coordinate = lga_dic[lga_name]
     temp_year_data = load_dict['year_data']
     X_ = []
     Y_ = []
@@ -145,12 +151,12 @@ def get_one_crimedata(lga_id):
     plt.ylabel("Crimes")
     plt.title(lga_name+" Recorded Crime Statistics")
     plt.savefig("crimes.png")
-    path  = os.getcwd()
+    path  = os.getcwd()+"/crimes.png"
     print(path)
     data = {'year_data': load_dict['year_data'],
             'average': load_dict['average'],
             'path':path}
-    json[load_dict['lga_name']] = {'coordinate': coordinate, 'data': data}
+    json[load_dict['lga_name']] = data
 
     return jsonify(json)
 
@@ -158,7 +164,7 @@ def get_one_crimedata(lga_id):
 @app.route('/get_all_rent', methods=['GET'])
 def get_all_rent():
     response = requests.get("http://localhost:5001/nsw_rent_data", params=None)
-    # print("statistics:", response.json())
+    print("statistics:", response.json())
     load_dict = response.json()
     json = {}
 
@@ -192,18 +198,18 @@ def get_all_rent():
                 rank = rank_list[sorted_x[i]['lga_name']]
             else:
                 rank = len(sorted_x)
-            coordinate = lga_dic[sorted_x[i]['lga_name']]
+            # coordinate = lga_dic[sorted_x[i]['lga_name']]
             data = {
                     'rank': rank }
-            json[sorted_x[i]['lga_name']] = {'coordinate':coordinate ,'data':data}
+            json[sorted_x[i]['lga_name']] = data
         else:
             print(sorted_x[i]['lga_name'])
 
 
     return jsonify(json)
-@app.route('/get_one_rent/<int:lga_id>', methods=['GET'])
+@app.route('/get_one_rent/<string:lga_id>', methods=['GET'])
 def get_one_rent(lga_id):
-    lga_name = lga_mapping[lga_id]
+    lga_name = lga_id
 
     lga_name = ''.join([x for x in lga_name.lower() if x.isalpha()])
     response = requests.get("http://localhost:5001/nsw_rent_data/" + lga_name, params=None)
@@ -211,7 +217,7 @@ def get_one_rent(lga_id):
     load_dict = response.json()
     json = {}
 
-    coordinate = lga_dic[lga_name]
+    # coordinate = lga_dic[lga_name]
     name_list = ['One Bed', 'Two Bed', 'Three Bed', 'Four Bed']
     num_list = [load_dict['one_bed'], load_dict['two_bed'], load_dict['three_bed'], load_dict['four_bed']]
     num_list1 = [load_dict['annual_rate_one_bed'], load_dict['annual_rate_two_bed'], load_dict['annual_rate_three_bed'], load_dict['annual_rate_four_bed']]
@@ -227,11 +233,11 @@ def get_one_rent(lga_id):
     plt.ylabel("Price")
     plt.title(lga_name+" Recorded RENT Statistics")
     plt.savefig("rents.png")
-    path = os.getcwd()
+    path = os.getcwd()+"/rents.png"
     print(path)
     data = {
             'path': path}
-    json[load_dict['lga_name']] = {'coordinate': coordinate, 'data': data}
+    json[load_dict['lga_name']] =data
 
     return jsonify(json)
 
@@ -240,23 +246,24 @@ def get_all_sales():
     response = requests.get("http://localhost:5001/nsw_sales_data", params=None)
     # print("statistics:", response.json())
     load_dict = response.json()
+    print(type(response))
     json = {}
     sorted_x = sorted(load_dict['entry'],
                       key=lambda k: k['median'])
     for i in range(len(sorted_x)):
         if sorted_x[i]['lga_name'] in lga_dic:
 
-            coordinate = lga_dic[sorted_x[i]['lga_name']]
+            # coordinate = lga_dic[sorted_x[i]['lga_name']]
             data = {
                 'rank': i}
-            json[sorted_x[i]['lga_name']] = {'coordinate': coordinate, 'data': data}
+            json[sorted_x[i]['lga_name']] = data
         else:
             print(sorted_x[i]['lga_name'])
 
     return jsonify(json)
-@app.route('/get_one_sale/<int:lga_id>', methods=['GET'])
+@app.route('/get_one_sale/<string:lga_id>', methods=['GET'])
 def get_one_sale(lga_id):
-    lga_name = lga_mapping[lga_id]
+    lga_name = lga_id
     lga_name = ''.join([x for x in lga_name.lower() if x.isalpha()])
     print(lga_name)
     response = requests.get("http://localhost:5001/nsw_sales_data/" + lga_name, params=None)
@@ -264,20 +271,57 @@ def get_one_sale(lga_id):
     load_dict = response.json()
     json = {}
 
-    coordinate = lga_dic[lga_name]
+    # coordinate = lga_dic[lga_name]
 
     data = {'median': load_dict['median'],
             'annual_rate_median': load_dict['annual_rate_median'],
             }
-    json[load_dict['lga_name']] = {'coordinate': coordinate, 'data': data}
+    json[load_dict['lga_name']] = data
 
     return jsonify(json)
 
+@app.route('/get_all_coordinates', methods=['GET'])
+def get_all_coordinates():
+    coordinate = lga_dic
+    return jsonify(coordinate)
 
 # plt.legend()
 # plt.show()
 
+@app.route('/get_all_rank', methods=['GET'])
+def get_all_set():
+    total_rank = {}
+    # sale_rank = get_all_sales()
+    response = requests.get("http://localhost:5000/get_all_sales", params=None)
+    # print("type",type(sale_rank))
+    sale_dic = response.json()
+    # print('kkkkkk', sale_dic)
+    response = requests.get("http://localhost:5000/get_all_rent", params=None)
+    # rent_rank = get_all_rent()
+    rent_dic = response.json()
+    response = requests.get("http://localhost:5000/get_all_crimedata", params=None)
+    # crime_rank = get_all_crimedata()
+    crime_dic = response.json()
+    print(sale_dic)
+    for ele in lga_set:
+        lga_name = ''.join([x for x in ele.lower() if x.isalpha()])
 
+        all_rank = []
+        if lga_name in sale_dic:
+            all_rank.append(sale_dic[lga_name]['rank'])
+        if lga_name in rent_dic:
+            all_rank.append(rent_dic[lga_name]['rank'])
+        if lga_name in crime_dic:
+            all_rank.append(crime_dic[lga_name]['rank'])
+        if len(all_rank) !=0:
+            total_rank[lga_name] = sum(all_rank)/len(all_rank)
+        else:
+            total_rank[lga_name] = len(lga_set)
+    rank_list = {}
+    sort_x = sorted(total_rank.items(), key=lambda a: a[1])
+    for ii in range(len(sort_x)):
+        rank_list[sort_x[ii][0]] = ii
+    return jsonify(rank_list)
 
 if __name__ == '__main__':
     app.run()
