@@ -1,18 +1,16 @@
 from flask import Flask, jsonify,request
-import googlemaps
-from datetime import datetime
 import math
 import os
 import numpy as np
 import json
 import requests
+import argparse
 import operator
 from openpyxl import load_workbook
 import matplotlib.pyplot as plt
 from scipy.interpolate import spline
+from flask_cors import *
 
-from selenium import webdriver
-import urllib
 
 # def get_js():
 #     # f = open("D:/WorkSpace/MyWorkSpace/jsdemo/js/des_rsa.js",'r',encoding='UTF-8')
@@ -100,13 +98,14 @@ lga_dic = json.load(x)
 lga_set = set()
 for key in lga_dic:
     lga_set.add(key)
-print(lga_set)
+# print(lga_set)
 app = Flask(__name__)
+CORS(app, supports_credentials=True)
 
 
 @app.route('/get_all_crimedata', methods=['GET'])
 def get_all_crimedata():
-    response = requests.get("http://localhost:5002/nsw_crime_data", params=None)
+    response = requests.get("http://localhost:50102/nsw_crime_data", params=None)
     # print("statistics:", response.json())
     load_dict = response.json()
     json = {}
@@ -130,7 +129,7 @@ def get_one_crimedata(lga_id):
     lga_name = lga_id
     lga_name = ''.join([x for x in lga_name.lower() if x.isalpha()])
     print(lga_name)
-    response = requests.get("http://localhost:5002/nsw_crime_data/"+ lga_name, params=None)
+    response = requests.get("http://localhost:50102/nsw_crime_data/"+ lga_name, params=None)
     print("statistics:", response.json())
     load_dict = response.json()
     json = {}
@@ -163,7 +162,7 @@ def get_one_crimedata(lga_id):
 
 @app.route('/get_all_rent', methods=['GET'])
 def get_all_rent():
-    response = requests.get("http://localhost:5001/nsw_rent_data", params=None)
+    response = requests.get("http://localhost:50101/nsw_rent_data", params=None)
     print("statistics:", response.json())
     load_dict = response.json()
     json = {}
@@ -212,7 +211,7 @@ def get_one_rent(lga_id):
     lga_name = lga_id
 
     lga_name = ''.join([x for x in lga_name.lower() if x.isalpha()])
-    response = requests.get("http://localhost:5001/nsw_rent_data/" + lga_name, params=None)
+    response = requests.get("http://localhost:50101/nsw_rent_data/" + lga_name, params=None)
     print("statistics:", response.json())
     load_dict = response.json()
     json = {}
@@ -243,7 +242,7 @@ def get_one_rent(lga_id):
 
 @app.route('/get_all_sales', methods=['GET'])
 def get_all_sales():
-    response = requests.get("http://localhost:5001/nsw_sales_data", params=None)
+    response = requests.get("http://localhost:50101/nsw_sales_data", params=None)
     # print("statistics:", response.json())
     load_dict = response.json()
     print(type(response))
@@ -266,7 +265,7 @@ def get_one_sale(lga_id):
     lga_name = lga_id
     lga_name = ''.join([x for x in lga_name.lower() if x.isalpha()])
     print(lga_name)
-    response = requests.get("http://localhost:5001/nsw_sales_data/" + lga_name, params=None)
+    response = requests.get("http://localhost:50101/nsw_sales_data/" + lga_name, params=None)
     print("statistics:", response.json())
     load_dict = response.json()
     json = {}
@@ -283,6 +282,7 @@ def get_one_sale(lga_id):
 @app.route('/get_all_coordinates', methods=['GET'])
 def get_all_coordinates():
     coordinate = lga_dic
+
     return jsonify(coordinate)
 
 # plt.legend()
@@ -292,14 +292,14 @@ def get_all_coordinates():
 def get_all_set():
     total_rank = {}
     # sale_rank = get_all_sales()
-    response = requests.get("http://localhost:5000/get_all_sales", params=None)
+    response = requests.get("http://localhost:50100/get_all_sales", params=None)
     # print("type",type(sale_rank))
     sale_dic = response.json()
     # print('kkkkkk', sale_dic)
-    response = requests.get("http://localhost:5000/get_all_rent", params=None)
+    response = requests.get("http://localhost:50100/get_all_rent", params=None)
     # rent_rank = get_all_rent()
     rent_dic = response.json()
-    response = requests.get("http://localhost:5000/get_all_crimedata", params=None)
+    response = requests.get("http://localhost:50100/get_all_crimedata", params=None)
     # crime_rank = get_all_crimedata()
     crime_dic = response.json()
     print(sale_dic)
@@ -324,4 +324,6 @@ def get_all_set():
     return jsonify(rank_list)
 
 if __name__ == '__main__':
-    app.run()
+
+    app.run(port=50100)
+
