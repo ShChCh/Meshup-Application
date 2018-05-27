@@ -1,12 +1,12 @@
 from flask import Flask, jsonify,request
-import math
+# import math
 import os
 import numpy as np
 import json
 import requests
-import argparse
-import operator
-from openpyxl import load_workbook
+# import argparse
+# import operator
+# from openpyxl import load_workbook
 import matplotlib.pyplot as plt
 from scipy.interpolate import spline
 from flask_cors import *
@@ -110,7 +110,7 @@ def get_all_crimedata():
     load_dict = response.json()
     json = {}
     sorted_x = sorted(load_dict['entry'], key=lambda k: k['average'])
-    # print(sorted_x)
+    print(len(sorted_x))
     for i in range(len(sorted_x)):
         if sorted_x[i]['lga_name'] in lga_dic:
 
@@ -322,6 +322,23 @@ def get_all_set():
     for ii in range(len(sort_x)):
         rank_list[sort_x[ii][0]] = ii
     return jsonify(rank_list)
+@app.route('/get_one_school/<string:lga_id>', methods=['GET'])
+def get_one_school(lga_id):
+    response = requests.get("http://localhost:50103/nsw_school_data/" + lga_id, params=None)
+    print("statistics:", response.json())
+    load_dict = response.json()
+    json = {}
+
+    for x in range(len(load_dict['entry'])):
+        data ={'postcode': load_dict['entry'][x]['post_code'],
+               'latitude' :load_dict['entry'][x]['latitude'],
+               'longitude':load_dict['entry'][x]['longitude'],
+               'school_type':load_dict['entry'][x]['school_type']
+               }
+        json[load_dict['entry'][x]['school_name']] = data
+    json['total_number'] =len(load_dict['entry'])
+    return jsonify(json)
+
 
 if __name__ == '__main__':
 
