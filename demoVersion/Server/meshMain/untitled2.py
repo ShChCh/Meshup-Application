@@ -364,15 +364,15 @@ def get_all_set():
     total_rank = {}
     # sale_rank = get_all_sales()
     # response = requests.get("http://localhost:50100/get_all_sales", params=None)
-    response = requests.get("http://0.0.0.0:80/get_all_sales", params=None)
+    response = requests.get("http://0.0.0.0:50100/get_all_sales", params=None)
     # print("type",type(sale_rank))
     sale_dic = response.json()
     # print('kkkkkk', sale_dic)
     # response = requests.get("http://localhost:50100/get_all_rent", params=None)
-    response = requests.get("http://0.0.0.0:80/get_all_rent", params=None)
+    response = requests.get("http://0.0.0.0:50100/get_all_rent", params=None)
     # rent_rank = get_all_rent()
     rent_dic = response.json()
-    response = requests.get("http://0.0.0.0:80/get_all_crimedata", params=None)
+    response = requests.get("http://0.0.0.0:50100/get_all_crimedata", params=None)
     # response = requests.get("http://localhost:50100/get_all_crimedata", params=None)
     # crime_rank = get_all_crimedata()
     crime_dic = response.json()
@@ -426,6 +426,6 @@ def get_img(file_name):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=80)
+    app.run(host='0.0.0.0', port=50100)
     # app.run(port=50100)
 

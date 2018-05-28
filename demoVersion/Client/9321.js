@@ -10,7 +10,7 @@ var imgMode = "rents";
 var diInfo1 = "(average dollar per week)";
 var diInfo2 = "(criminal per 100,000 population)";
 var currentPolygonName = 'randwick';
-var serverURL = 'http://ec2-54-252-243-63.ap-southeast-2.compute.amazonaws.com';
+var serverURL = 'http://ec2-54-252-243-63.ap-southeast-2.compute.amazonaws.com:50100';
 var neighborhoods = []
 var markers = [];
 var marker;
@@ -201,7 +201,8 @@ function toggleBounce() {
         $.getJSON(serverURL+'/get_one_rent/'+currentPolygonName, function(currInfo1) {
         $.getJSON(serverURL+'/get_one_crimedata/'+currentPolygonName, function(currInfo2) {
             console.log(currentPolygonName);
-            var imgUrl = 'https://maps.googleapis.com/maps/api/streetview?size=400x280&location='+currLat+','+currLng+'&fov=90&heading=90&pitch=10';
+            var imgUrl = 'https://maps.googleapis.com/maps/api/streetview?size=400x280&location='+currLat+','+currLng+'&fov=90&heading=90&pitch=10&key=AIzaSyAwkQll0J9NdAYif0GXjCGmwU9Cbe1oRKg';
+            console.log('imgUrl:___'+imgUrl);
             //var imgUrl2 = serverURL+'/img/crimes';
             var imgUrl2 = serverURL+currInfo1[currentPolygonName]["path"];
             var imgUrl3 = serverURL+currInfo2[currentPolygonName]["path"];
@@ -503,7 +504,7 @@ function setSchool(){
                 name: item,
                 type: currInfo[item]["school_type"],
                 title: 'School: '+item+' , type: '+currInfo[item]["school_type"],
-                draggable: true,
+                draggable: false,
                 animation: google.maps.Animation.DROP
             });
             
@@ -514,8 +515,9 @@ function setSchool(){
         if(infowindow02!=null)
             infowindow02.close();
         // 经纬度  
-            var imgUrl = 'https://maps.googleapis.com/maps/api/streetview?size=400x280&location='+lat+','+lng+'&fov=90&heading=90&pitch=10';
-            var contentString = '<div id="content">'+
+            var imgUrl = 'https://maps.googleapis.com/maps/api/streetview?size=400x280&location='+lat+','+lng+'&fov=90&heading=90&pitch=10&key=AIzaSyAwkQll0J9NdAYif0GXjCGmwU9Cbe1oRKg';
+            console.log('imgUrl2:___'+imgUrl);
+	    var contentString = '<div id="content">'+
                 '<div id="siteNotice">'+
                 '</div>'+
                 '<h1 id="firstHeading" class="firstHeading">'+
@@ -542,4 +544,7 @@ function setSingle(){
     console.log("Single");
     for(var j=0; j<polygonArr.length; j++)
         polygonArr[j].setMap(null);
+    for(var i=0; i<neighborhoods.length; i++)
+        neighborhoods[i].setMap(null);
+    neighborhoods = [];
 }

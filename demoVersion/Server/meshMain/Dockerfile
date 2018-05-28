@@ -11,7 +11,7 @@ ADD . /app
 RUN pip install --trusted-host pypi.python.org -r requirements.txt
 
 # Make port 50100 available to the world outside this container
-EXPOSE 80
+EXPOSE 50100
 
 # Define environment variable
 ENV NAME World
