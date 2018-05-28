@@ -5,6 +5,7 @@ var data;
 // var imgMode = "crimes";
 // var diInfo = "(criminals per 100,000 population)";
 var mode = "get_one_rent";
+var currHMtxt = "";
 var imgMode = "rents";
 var diInfo1 = "(average dollar per week)";
 var diInfo2 = "(criminal per 100,000 population)";
@@ -17,7 +18,7 @@ var myCenter = {lat: -33.91665490690587, lng: 151.2312249841309};
 var lastPolyonIdx = -1;
 
 var polygonArr = [];
-var colors = ['#ffffb2', '#fecc5c', '#fd8d3c', '#f03b20', '#bd0026'];
+var colors = ['#ffce7b', '#f8aba6', '#f3704b', '#ef5b9x', '#ae5039'];
 function MapMenu(controlDiv, map, txt, type) {
 
         // tab controllers
@@ -27,20 +28,25 @@ function MapMenu(controlDiv, map, txt, type) {
         controlUI.style.cursor = 'pointer';
         controlUI.style.marginBottom = '22px';
         controlUI.style.marginLeft = '15px';
-        controlUI.style.marginRight = '15px';
+        controlUI.style.marginRight = '2px';
         controlUI.style.marginTop = '15px';
         controlUI.style.textAlign = 'center';
-        controlUI.style.backgroundColor = '#ffffff';
-        controlUI.title = 'Click to change mode';
-        // controlUI.setAttribute("class", 'btn btn-primary');
+        // controlUI.style.border = '2px solid #fff';
+        // controlUI.style.borderRadius = '3px';
+        // controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+        //controlUI.style.backgroundColor = '#B9B9FF';
+        controlUI.style.fontWeight = 'bold';
+        controlUI.title = 'Click to '+currHMtxt;
+        controlUI.setAttribute("class", 'btn btn-primary');
         controlDiv.appendChild(controlUI);
 
         // Set CSS for the control interior.
-        var controlText = document.createElement('div');
-        controlText.style.color = 'rgb(25,25,25)';
+        var controlText = document.createElement('a');
+        controlText.style.color = 'rgb(220,120,120)';
         controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
         controlText.style.fontSize = '12px';
-        controlText.style.lineHeight = '38px';
+        controlText.style.lineHeight = '15px';
+        // controlText.style.fontColor = '#000000';
         controlText.innerHTML = txt;
         controlUI.appendChild(controlText);
 
@@ -60,8 +66,68 @@ function MapMenu(controlDiv, map, txt, type) {
                 setSchool();
         });
 
-      }
+}
 
+
+function MapColor(controlDiv, map) {
+        // Set CSS for the control border.
+        var controlUI = document.createElement('div');
+        controlUI.style.cursor = 'pointer';
+        controlUI.style.marginBottom = '22px';
+        controlUI.style.marginLeft = '15px';
+        controlUI.style.marginRight = '2px';
+        controlUI.style.marginTop = '15px';
+        controlUI.style.textAlign = 'center';
+        // controlUI.style.border = '2px solid #fff';
+        // controlUI.style.borderRadius = '3px';
+        // controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+        //controlUI.style.backgroundColor = '#B9B9FF';
+        controlUI.style.fontWeight = 'bold';
+        controlUI.title = 'Layers Chart';
+        controlUI.setAttribute("class", 'btn btn-primary1');
+        controlDiv.appendChild(controlUI);
+        
+        var controlText = document.createElement('font');
+        controlText.color = colors[0];
+        controlText.size = '8';
+        controlText.style.fontSize = '12px';
+        controlText.style.lineHeight = '15px';
+        controlText.innerHTML = '■■■<p style="font-color:#000000;">excellent</p>';
+        controlUI.appendChild(controlText);
+        
+        var controlText1 = document.createElement('font');
+        controlText1.color = colors[1];
+        controlText1.size = '8';
+        controlText1.style.fontSize = '12px';
+        controlText1.style.lineHeight = '15px';
+        controlText1.innerHTML = '■■■<p style="font-color:#000000;">nice</p>';
+        controlUI.appendChild(controlText1);
+        
+        var controlText2 = document.createElement('font');
+        controlText2.color = colors[2];
+        controlText2.size = '8';
+        controlText2.style.fontSize = '12px';
+        controlText2.style.lineHeight = '15px';
+        controlText2.innerHTML = '■■■<p style="font-color:#000000;">good</p>';
+        controlUI.appendChild(controlText2);
+        
+        var controlText3 = document.createElement('font');
+        controlText3.color = colors[3];
+        controlText3.size = '8';
+        controlText3.style.fontSize = '12px';
+        controlText3.style.lineHeight = '15px';
+        controlText3.innerHTML = '■■■<p style="font-color:#000000;">careful</p>';
+        controlUI.appendChild(controlText3);
+        
+        var controlText4 = document.createElement('font');
+        controlText4.color = colors[4];
+        controlText4.size = '8';
+        controlText4.style.fontSize = '12px';
+        controlText4.style.lineHeight = '15px';
+        controlText4.innerHTML = '■■■<p style="font-color:#000000;">extreme</p>';
+        controlUI.appendChild(controlText4);
+        
+}
 
 function clearMarkers() {
   for (var i = 0; i < markers.length; i++) {
@@ -138,9 +204,9 @@ function toggleBounce() {
 }
 
 function initMap() {
-    $.getJSON(serverURL+'/get_all_coordinates', function(cdata) {
+   $.getJSON(serverURL+'/get_all_coordinates', function(cdata) {
             //data is the JSON string
-            data = cdata;
+   data = cdata;
             
   // load cowra map 
   // 边界构成的多边形存在polygonArr中
@@ -148,7 +214,7 @@ function initMap() {
   var cowraTest = data;
   map = new google.maps.Map(document.getElementById('map'), {
     center: myCenter,
-    zoom: 16,
+    zoom: 8,
     disableDefaultUI: true,
     zoomControl: true,
     scaleControl: true
@@ -208,24 +274,28 @@ function initMap() {
   });
   marker.addListener('click', toggleBounce);
   
+  currHMtxt = "check Rating Heat Map";
   var btnDiv = document.createElement('div');
   var btn = new MapMenu(btnDiv, map, 'Rating', 4);
   btnDiv.index = 1;
   map.controls[google.maps.ControlPosition.TOP_CENTER].push(btnDiv);
   
   
+  currHMtxt = "check Sales Heat Map";
   var btnDiv1 = document.createElement('div');
   var btn1 = new MapMenu(btnDiv1, map, 'Sales', 3);
   btnDiv1.index = 2;
   map.controls[google.maps.ControlPosition.TOP_CENTER].push(btnDiv1);
   
   
+  currHMtxt = "check Criminal Heat Map";
   var btnDiv2 = document.createElement('div');
   var btn2 = new MapMenu(btnDiv2, map, 'Criminal', 1);
   btnDiv2.index = 3;
   map.controls[google.maps.ControlPosition.TOP_CENTER].push(btnDiv2);
   
   
+  currHMtxt = "check Renting Heat Map";
   var btnDiv3 = document.createElement('div');
   var btn3 = new MapMenu(btnDiv3, map, 'Renting', 2);
   btnDiv3.index = 4;
@@ -233,17 +303,25 @@ function initMap() {
   
   
   
+  currHMtxt = "free press on";
   var btnDiv4 = document.createElement('div');
   var btn4 = new MapMenu(btnDiv4, map, 'Free Press', 5);
-  btnDiv4.index = 5;
-  map.controls[google.maps.ControlPosition.TOP_CENTER].push(btnDiv4);
+  btnDiv4.index = 1;
+  map.controls[google.maps.ControlPosition.RIGHT_CENTER].push(btnDiv4);
   
   
+  currHMtxt = "check school nearby";
   var btnDiv5 = document.createElement('div');
   var btn5 = new MapMenu(btnDiv5, map, 'School Nearby', 6);
-  btnDiv5.index = 1;
+  btnDiv5.index = 2;
   map.controls[google.maps.ControlPosition.RIGHT_CENTER].push(btnDiv5);
   
+  //MapColor
+  
+  var btnDiv6 = document.createElement('div');
+  var btn6 = new MapColor(btnDiv6, map);
+  btnDiv6.index = 1;
+  map.controls[google.maps.ControlPosition.LEFT_CENTER].push(btnDiv6);
   
   // 当前地点点击，画边界，然后放信息
   
