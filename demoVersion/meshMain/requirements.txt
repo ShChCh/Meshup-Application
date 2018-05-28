@@ -1,0 +1,7 @@
+requests
+flask
+json
+numpy
+matplotlib.pyplot
+scipy.interpolate
+flask_cors

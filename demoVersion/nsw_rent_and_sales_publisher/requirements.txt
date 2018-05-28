@@ -1,0 +1,5 @@
+requests
+flask
+werkzeug
+mongoengine
+flask_cors
