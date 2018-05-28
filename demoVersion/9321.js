@@ -16,6 +16,9 @@ var markers = [];
 var marker;
 var myCenter = {lat: -33.91665490690587, lng: 151.2312249841309};
 var lastPolyonIdx = -1;
+var IconNames = {'Schools for Specific Purposes':'Schools for Specific Purposes','Primary School':'Primary School','Secondary School':'Secondary School','Other School':'Other School','Central/Community School':'Central Community School','Environmental Education Centre':'Environmental Education Centre','Infants School':'Infants School'};
+var infowindow01;
+var infowindow02;
 
 var polygonArr = [];
 var colors = ['#ffce7b', '#f8aba6', '#f3704b', '#ef5b9x', '#ae5039'];
@@ -146,6 +149,8 @@ function toggleBounce() {
   var retLocation;
   var geocoder = new google.maps.Geocoder();
   var arr = new Array();
+  if(infowindow01!=null)
+      infowindow01.close();
   geocoder.geocode(
     {location:new google.maps.LatLng(currLat, currLng)},
     function geoResults(results, status){
@@ -183,10 +188,10 @@ function toggleBounce() {
                 '</div>'+
                 '</div>';
 
-            var infowindow = new google.maps.InfoWindow({
+            infowindow01 = new google.maps.InfoWindow({
               content: contentString
             });
-            infowindow.open(map, marker);
+            infowindow01.open(map, marker);
             if (marker.getAnimation() !== null) {
               marker.setAnimation(null);
             } else {
@@ -214,7 +219,7 @@ function initMap() {
   var cowraTest = data;
   map = new google.maps.Map(document.getElementById('map'), {
     center: myCenter,
-    zoom: 8,
+    zoom: 12,
     disableDefaultUI: true,
     zoomControl: true,
     scaleControl: true
@@ -247,7 +252,7 @@ function initMap() {
         marker = new google.maps.Marker({
             position: {lat:lat, lng:lng},
             map: map,
-            title: 'check info or move by click',
+            title: 'check info or move by mouse',
             draggable: true,
             animation: google.maps.Animation.DROP
         });
@@ -328,7 +333,20 @@ function initMap() {
     google.maps.event.addListener(map, "click", function(event) {  
       var lat = event.latLng.lat();  
       var lng = event.latLng.lng();  
-      // 经纬度  
+      var flag = false;
+      if(infowindow02!=null){
+          infowindow02.close();
+          infowindow02 = null;
+          flag = true;
+      }
+      if(infowindow01!=null){
+          infowindow01.close();
+          infowindow01 = null;
+          flag = true;
+      }
+      if(flag)
+          return;
+      // lat lng  
       for(var k=0; k<polygonArr.length; k++){
           if(google.maps.geometry.poly.containsLocation(event.latLng, polygonArr[k])){
               if(lastPolyonIdx!=-1)
@@ -432,10 +450,16 @@ function setSchool(){
     $.getJSON(serverURL+'/get_one_school/'+currentPolygonName, function(currInfo) {
         //var neighborhoods = [{lat: -33.91337, lng: 151.23171},];
         console.log(currInfo);
+        if(currInfo==null)
+            return;
         var count = 0;
         for(var item in currInfo){
+            if(item === "total_number")
+                continue;
+            console.log('check  /img/'+IconNames[currInfo[item]["school_type"]]);
             var newMarker = new google.maps.Marker({
                 position: {lat:parseFloat(currInfo[item]["latitude"]), lng:parseFloat(currInfo[item]["longitude"])},
+                icon: serverURL+'/img/'+IconNames[currInfo[item]["school_type"]],
                 map: map,
                 name: item,
                 type: currInfo[item]["school_type"],
@@ -446,11 +470,13 @@ function setSchool(){
             
             neighborhoods.push(newMarker);
       google.maps.event.addListener(newMarker, "click", function(event) {  
-        var lat = event.latLng.lat();  
-        var lng = event.latLng.lng();  
+        var lat = this.getPosition().lat();  
+        var lng = this.getPosition().lng();  
+        if(infowindow02!=null)
+            infowindow02.close();
         // 经纬度  
             var imgUrl = 'https://maps.googleapis.com/maps/api/streetview?size=400x280&location='+lat+','+lng+'&fov=90&heading=90&pitch=10';
-        var contentString = '<div id="content">'+
+            var contentString = '<div id="content">'+
                 '<div id="siteNotice">'+
                 '</div>'+
                 '<h1 id="firstHeading" class="firstHeading">'+
@@ -463,10 +489,10 @@ function setSchool(){
                 '</div>'+
                 '</div>';
 
-            var infowindow = new google.maps.InfoWindow({
+            infowindow02 = new google.maps.InfoWindow({
               content: contentString
             });
-            infowindow.open(map, this);
+            infowindow02.open(map, this);
         });  
         }
     });

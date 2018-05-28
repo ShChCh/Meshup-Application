@@ -11,10 +11,10 @@ ADD . /app
 RUN pip install --trusted-host pypi.python.org -r requirements.txt
 
 # Make port 50100 available to the world outside this container
-EXPOSE 50100
+EXPOSE 80
 
 # Define environment variable
 ENV NAME World
 
 # Run app.py when the container launches
-CMD ["python", "untitled2.py.py"]
+CMD ["python", "untitled2.py"]

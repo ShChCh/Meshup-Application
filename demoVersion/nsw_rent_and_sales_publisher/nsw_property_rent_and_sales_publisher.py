@@ -164,7 +164,7 @@ def update_db():
 
 
 if __name__ == "__main__":
-    update_db()
+    # `update_db()
     # scheduler = BackgroundScheduler()
     # scheduler.start()
     # scheduler.add_job(
@@ -176,4 +176,4 @@ if __name__ == "__main__":
     # # Shut down the scheduler when exiting the app
     # atexit.register(lambda: scheduler.shutdown())
     #
-    app.run(port=50101)
+    app.run(host='0.0.0.0',port=50101)

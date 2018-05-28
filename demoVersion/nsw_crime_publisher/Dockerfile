@@ -17,4 +17,4 @@ EXPOSE 50102
 ENV NAME World
 
 # Run app.py when the container launches
-CMD ["python", "nsw_crime_publisher.py.py"]
+CMD ["python", "nsw_crime_publisher.py"]

@@ -200,4 +200,4 @@ if __name__ == "__main__":
     # Shut down the scheduler when exiting the app
     atexit.register(lambda: scheduler.shutdown())
 
-    app.run(port=50102)
+    app.run(host='0.0.0.0',port=50102)

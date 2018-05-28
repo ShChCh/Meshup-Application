@@ -75,5 +75,5 @@ def get_all_school_data():
 
 
 if __name__ == "__main__":
-    update_db()
-    app.run(port=50103)
+    #`update_db()
+    app.run(host='0.0.0.0',port=50103)

@@ -1,7 +1,5 @@
 requests
 flask
-json
-numpy
-matplotlib.pyplot
-scipy.interpolate
+matplotlib
+scipy
 flask_cors

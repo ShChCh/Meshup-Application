@@ -1,5 +1,7 @@
 requests
 flask
+xlrd
 werkzeug
+apscheduler
 mongoengine
 flask_cors

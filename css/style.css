@@ -195,8 +195,13 @@ textarea.form-control{
 }
 
 .btn-primary{
-	background: transparent;
-	border:1px solid #000;
+    background: #cde6c7;
+	border: 1px solid #000;
+	color: #000;
+}
+.btn-primary1{
+    background: #FFFFFF;
+	border: 1px solid #000;
 	color: #000;
 }
 

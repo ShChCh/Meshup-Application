@@ -1,3 +1,3 @@
 apt-get install docker.io
-docker build -t comp9900 .
-docker run -p 80:80 comp9900
+docker build -t server02 .
+docker run -p 50102:50102 server02

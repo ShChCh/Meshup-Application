@@ -1,3 +1,0 @@
-flask
-mongoengine
-flask_cors

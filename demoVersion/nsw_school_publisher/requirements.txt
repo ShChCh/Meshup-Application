@@ -1,3 +1,4 @@
 flask
-request
-redis
+apscheduler
+mongoengine
+flask_cors
