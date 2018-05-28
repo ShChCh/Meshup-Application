@@ -97,6 +97,8 @@ from flask_cors import *
 #
 #     json.dump(lga_list, f)
 x = open('./final_lga.json','r')
+# x = open('/Users/wyj/Desktop/Meshup-Application/final_lga.json','r')
+
 lga_dic = json.load(x)
 lga_set = set()
 for key in lga_dic:
@@ -137,7 +139,11 @@ def get_one_crimedata(lga_id):
     # response = requests.get("http://localhost:50102/nsw_crime_data/"+ lga_name, params=None)
     response = requests.get("http://54.252.243.63:50102/nsw_crime_data/" + lga_name, params=None)
     if response.status_code == 404:
-        return jsonify('wrong lganame'), 404
+        json ={}
+        data = {
+                'path': '/img/404'}
+        json[lga_id] = data
+        return jsonify(json)
     print("statistics:", response.json())
     load_dict = response.json()
     json = {}
@@ -157,8 +163,11 @@ def get_one_crimedata(lga_id):
     plt.xlabel("Year")
     plt.ylabel("Crimes")
     plt.title(lga_name+" Recorded Crime Statistics")
-    plt.savefig("crimes.png")
-    path  = "/img/crimes"
+    for a, b in zip(X_, Y_):
+        plt.text(a, b + 0.1, '%.0f' % b, ha='center', va='bottom', fontsize=11)
+    plt.savefig("crimes_" + lga_name + ".png")
+    plt.close()
+    path = "/img/crimes_" + lga_name
     print(path)
     data = {'year_data': load_dict['year_data'],
             'average': load_dict['average'],
@@ -224,29 +233,74 @@ def get_one_rent(lga_id):
     # response = requests.get("http://localhost:50101/nsw_rent_data/" + lga_name, params=None)
     response = requests.get("http://54.252.243.63:50101/nsw_rent_data/" + lga_name, params=None)
     if response.status_code == 404:
-        return jsonify('wrong lganame'), 404
+        json = {}
+        data = {
+            'path': '/img/404'}
+        json[lga_id] = data
+        return jsonify(json)
     print("statistics:", response.json())
     load_dict = response.json()
     json = {}
 
     # coordinate = lga_dic[lga_name]
     name_list = ['One Bed', 'Two Bed', 'Three Bed', 'Four Bed']
-    num_list = [load_dict['one_bed'], load_dict['two_bed'], load_dict['three_bed'], load_dict['four_bed']]
-    num_list1 = [load_dict['annual_rate_one_bed'], load_dict['annual_rate_two_bed'], load_dict['annual_rate_three_bed'], load_dict['annual_rate_four_bed']]
-    x = list(range(len(num_list)))
-    total_width, n = 0.8, 2
-    width = total_width / n
+    num_list = [float(load_dict['one_bed']), float(load_dict['two_bed']), float(load_dict['three_bed']), float(load_dict['four_bed'])]
+    print(num_list)
+    num_list1 = [float(load_dict['annual_rate_one_bed']), float(load_dict['annual_rate_two_bed']), float(load_dict['annual_rate_three_bed']), float(load_dict['annual_rate_four_bed'])]
+    print(num_list1)
 
-    plt.bar(x, num_list, width=width, label='Price', fc='y')
-    for i in range(len(x)):
-        x[i] = x[i] + width
-    plt.bar(x, num_list1, width=width, label='annual rate', tick_label=name_list, fc='r')
+    x = np.arange(len(num_list))
+    # x = list(range(len(num_list)))
+    # total_width, n = 0.8, 2
+    # width = total_width / n
+    #
+    # a1 = plt.bar(x, num_list, width=width, label='Price',tick_label=name_list, fc='y')
+    # for i in range(len(x)):
+    #     x[i] = x[i] + width
+    # # plt.bar(x, num_list1, width=width, label='annual rate', tick_label=name_list, fc='r')
+    #
+    # plt.ylabel("Price")
+    # plt.title(lga_name+" Recorded RENT Statistics")
+    # plt.savefig("rents.png")
 
-    plt.ylabel("Price")
-    plt.title(lga_name+" Recorded RENT Statistics")
-    plt.savefig("rents.png")
-    path = "/img/rents"
-    print(path)
+    fig = plt.figure()  # Create matplotlib figure
+
+    ax = fig.add_subplot(111)  # Create matplotlib axes
+    ax2 = ax.twinx()  # Create another axes that shares the same x-axis as ax.
+
+    width = 0.4
+    ax.bar(x, num_list, width,
+                    color='yellow',
+                    error_kw=dict(elinewidth=2, ecolor='red',), label='Price')
+    ax2.bar(x+width, num_list1, width,
+                     color='red',
+                     error_kw=dict(elinewidth=2, ecolor='black'), label='annual_rate')
+
+    # ax.plot(num_list,kind='bar', color='red', ax=ax, width=width, position=1,tick_label=name_list)
+    # ax2.plot(num_list1,kind='bar', color='blue', ax=ax2, width=width, position=0,tick_label=name_list)
+    ax.set_xlim(-width, len(x) + width)
+    ax.set_ylim(0,max(num_list)+500)
+    ax.set_ylabel('Price')
+    ax2.set_ylim(min(num_list1)-10,max(num_list1)+10)
+    ax2.set_ylabel('rate(%)')
+    # ax.set_title('Scores by group and gender')
+    xTickMarks = name_list
+    ax.set_xticks(x + width)
+    xtickNames = ax.set_xticklabels(xTickMarks)
+    for a, b in zip(x, num_list):
+        ax.text(a, b + 0.1, '%.0f' % b, ha='center', va='bottom', fontsize=11)
+    for a, b in zip(x, num_list1):
+        ax2.text(a+width, b + 0.1, '%.0f' % b, ha='center', va='bottom', fontsize=11)
+
+    fig.legend()
+    # plt.setp(xtickNames, rotation=90, fontsize=10)
+
+    # ax.set_ylabel('Amount')
+    # ax2.set_ylabel('Price')
+    plt.title(lga_name + " Recorded RENT Statistics")
+    plt.savefig("rents_"+lga_name+".png")
+    plt.close()
+    path = "/img/rents_"+lga_name
     data = {
             'path': path}
     json[load_dict['lga_name']] =data
@@ -259,7 +313,7 @@ def get_all_sales():
     response = requests.get("http://54.252.243.63:50101/nsw_sales_data", params=None)
     # print("statistics:", response.json())
     load_dict = response.json()
-    print(type(response))
+    # print(type(response))
     json = {}
     sorted_x = sorted(load_dict['entry'],
                       key=lambda k: k['median'])
@@ -278,7 +332,7 @@ def get_all_sales():
 def get_one_sale(lga_id):
     lga_name = lga_id
     lga_name = ''.join([x for x in lga_name.lower() if x.isalpha()])
-    print(lga_name)
+    # print(lga_name)
     # response = requests.get("http://localhost:50101/nsw_sales_data/" + lga_name, params=None)
     response = requests.get("http://54.252.243.63:50101/nsw_sales_data/" + lga_name, params=None)
     if response.status_code == 404:
@@ -310,19 +364,19 @@ def get_all_set():
     total_rank = {}
     # sale_rank = get_all_sales()
     # response = requests.get("http://localhost:50100/get_all_sales", params=None)
-    response = requests.get("http://54.252.243.63:50100/get_all_sales", params=None)
+    response = requests.get("http://0.0.0.0:80/get_all_sales", params=None)
     # print("type",type(sale_rank))
     sale_dic = response.json()
     # print('kkkkkk', sale_dic)
     # response = requests.get("http://localhost:50100/get_all_rent", params=None)
-    response = requests.get("http://54.252.243.63:50100/get_all_rent", params=None)
+    response = requests.get("http://0.0.0.0:80/get_all_rent", params=None)
     # rent_rank = get_all_rent()
     rent_dic = response.json()
-    response = requests.get("http://54.252.243.63:50100/get_all_crimedata", params=None)
+    response = requests.get("http://0.0.0.0:80/get_all_crimedata", params=None)
     # response = requests.get("http://localhost:50100/get_all_crimedata", params=None)
     # crime_rank = get_all_crimedata()
     crime_dic = response.json()
-    print(sale_dic)
+    # print(sale_dic)
     for ele in lga_set:
         lga_name = ''.join([x for x in ele.lower() if x.isalpha()])
 
@@ -340,7 +394,9 @@ def get_all_set():
     rank_list = {}
     sort_x = sorted(total_rank.items(), key=lambda a: a[1])
     for ii in range(len(sort_x)):
-        rank_list[sort_x[ii][0]] = ii
+        data = {}
+        data['rank'] = ii
+        rank_list[sort_x[ii][0]] = data
     return jsonify(rank_list)
 @app.route('/get_one_school/<string:lga_id>', methods=['GET'])
 def get_one_school(lga_id):
@@ -364,14 +420,12 @@ def get_one_school(lga_id):
 
 @app.route('/img/<file_name>')
 def get_img(file_name):
-    # with open("/Users/wyj/Desktop/{}.png".format(file_name), 'rb') as f:
-    #     print(f.read()
+    #with open("{}.png".format(file_name), 'rb') as f:
+     #   return f
     return send_file("{}.png".format(file_name),mimetype="image/png")
 
 
-
 if __name__ == '__main__':
-    # app.run(host='0.0.0.0', port=80)
-
-    app.run(port=50100)
+    app.run(host='0.0.0.0', port=80)
+    # app.run(port=50100)
 
