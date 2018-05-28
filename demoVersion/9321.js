@@ -16,7 +16,7 @@ var markers = [];
 var marker;
 var myCenter = {lat: -33.91665490690587, lng: 151.2312249841309};
 var lastPolyonIdx = -1;
-var IconNames = {'Schools for Specific Purposes':'Schools for Specific Purposes','Primary School':'Primary School','Secondary School':'Secondary School','Other School':'Other School','Central/Community School':'Central Community School','Environmental Education Centre':'Environmental Education Centre','Infants School':'Infants School'};
+var IconNames = {'Schools for Specific Purposes':'1','Primary School':'2','Secondary School':'3','Other School':'4','Central/Community School':'5','Environmental Education Centre':'6','Infants School':'7'};
 var infowindow01;
 var infowindow02;
 
@@ -143,6 +143,8 @@ function MapSchool(controlDiv, map) {
         controlUI.style.marginTop = '15px';
         controlUI.style.textAlign = 'center';
         controlUI.style.fontWeight = 'bold';
+        controlUI.style.paddingLeft = '1px';
+        controlUI.style.paddingRight = '1px';
         controlUI.title = 'School Icons';
         controlUI.setAttribute("class", 'btn btn-primary1');
         controlDiv.appendChild(controlUI);
@@ -152,12 +154,12 @@ function MapSchool(controlDiv, map) {
         controlText.style.fontSize = '12px';
         controlText.style.lineHeight = '15px';
         controlText.innerHTML = '';
-        console.log("__get__SC");
         for(var g in IconNames){
             controlText.innerHTML = controlText.innerHTML + 
-                '<img src="'+serverURL+'/img/'+IconNames[g]+'" style="width:30px;height:30px;" /><p style="font-color:#000000;"> '+g+' </p>'+
+                '<img src="'+serverURL+'/img/'+IconNames[g]+'" style="width:30px;height:30px;" /><br /><p style="font-color:#000000;"> '+g+' </p>'+
             '';
-            console.log("g");
+            console.log(g);
+            console.log(IconNames[g]);
         }
         controlUI.appendChild(controlText);
         
@@ -252,7 +254,7 @@ function initMap() {
   var cowraTest = data;
   map = new google.maps.Map(document.getElementById('map'), {
     center: myCenter,
-    zoom: 12,
+    zoom: 16,
     disableDefaultUI: true,
     zoomControl: true,
     scaleControl: true
@@ -345,14 +347,14 @@ function initMap() {
   var btnDiv4 = document.createElement('div');
   var btn4 = new MapMenu(btnDiv4, map, 'Free Press', 5);
   btnDiv4.index = 1;
-  map.controls[google.maps.ControlPosition.RIGHT_CENTER].push(btnDiv4);
+  map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(btnDiv4);
   
   
   currHMtxt = "check school nearby";
   var btnDiv5 = document.createElement('div');
   var btn5 = new MapMenu(btnDiv5, map, 'School Nearby', 6);
   btnDiv5.index = 2;
-  map.controls[google.maps.ControlPosition.RIGHT_CENTER].push(btnDiv5);
+  map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(btnDiv5);
   
   //MapColor
   
@@ -365,7 +367,7 @@ function initMap() {
   var btnDiv7 = document.createElement('div');
   var btn7 = new MapSchool(btnDiv7, map);
   btnDiv7.index = 1;
-  map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(btnDiv7);
+  map.controls[google.maps.ControlPosition.RIGHT_CENTER].push(btnDiv7);
   
     google.maps.event.addListener(map, "click", function(event) {  
       var lat = event.latLng.lat();  
