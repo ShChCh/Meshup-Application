@@ -132,6 +132,39 @@ function MapColor(controlDiv, map) {
         
 }
 
+
+function MapSchool(controlDiv, map) {
+        // Set CSS for the control border.
+        var controlUI = document.createElement('div');
+        controlUI.style.cursor = 'pointer';
+        controlUI.style.marginBottom = '22px';
+        controlUI.style.marginLeft = '15px';
+        controlUI.style.marginRight = '2px';
+        controlUI.style.marginTop = '15px';
+        controlUI.style.textAlign = 'center';
+        controlUI.style.fontWeight = 'bold';
+        controlUI.title = 'School Icons';
+        controlUI.setAttribute("class", 'btn btn-primary1');
+        controlDiv.appendChild(controlUI);
+        
+        var controlText = document.createElement('div');
+        controlText.color = '#191919';
+        controlText.style.fontSize = '12px';
+        controlText.style.lineHeight = '15px';
+        controlText.innerHTML = '';
+        console.log("__get__SC");
+        for(var g in IconNames){
+            controlText.innerHTML = controlText.innerHTML + 
+                '<img src="'+serverURL+'/img/'+IconNames[g]+'" style="width:30px;height:30px;" /><p style="font-color:#000000;"> '+g+' </p>'+
+            '';
+            console.log("g");
+        }
+        controlUI.appendChild(controlText);
+        
+        
+}
+
+
 function clearMarkers() {
   for (var i = 0; i < markers.length; i++) {
     markers[i].setMap(null);
@@ -328,7 +361,11 @@ function initMap() {
   btnDiv6.index = 1;
   map.controls[google.maps.ControlPosition.LEFT_CENTER].push(btnDiv6);
   
-  // 当前地点点击，画边界，然后放信息
+  
+  var btnDiv7 = document.createElement('div');
+  var btn7 = new MapSchool(btnDiv7, map);
+  btnDiv7.index = 1;
+  map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(btnDiv7);
   
     google.maps.event.addListener(map, "click", function(event) {  
       var lat = event.latLng.lat();  
